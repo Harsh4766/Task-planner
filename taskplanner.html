@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ToDos List</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4bw+/aepP/YC94hEpVNVgiZdgIC5+VKNBQNGCHeKRQN+PtmoHDEXuppvnDJzQIu9" crossorigin="anonymous" />
+  <style>
+    body {
+      background-color: #f8f9fa;
+    }
+    .navbar {
+      margin-bottom: 20px;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h2, h3 {
+      color: #333;
+    }
+    .form-label {
+      color: #555;
+    }
+    #add, #clear {
+      width: 100%;
+    }
+    .table thead {
+      background-color: #343a40;
+      color: #ffffff;
+    }
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg bg-secondary">
+    <div class="container-fluid">
+      <a class="navbar-brand text-white" href="#">ToDos List</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link active text-white" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-white" href="#">Contact Us</a>
+          </li>
+        </ul>
+        <form class="d-flex" role="search">
+          <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+          <button class="btn btn-primary" type="submit">Search</button>
+        </form>
+      </div>
+    </div>
+  </nav>
+  <div class="container my-4">
+    <h2 class="text-center">ToDos List</h2>
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <input type="text" class="form-control" id="title" placeholder="Enter title" />
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Description</label>
+      <textarea class="form-control" id="description" rows="3" placeholder="Enter description"></textarea>
+    </div>
+    <div class="mb-3">
+      <button class="btn btn-primary mb-3" id="add">Add To List</button>
+      <button class="btn btn-danger mb-3" id="clear" onclick="clearstorage()">Clear All</button>
+    </div>
+    <div id="item" class="my-4">
+      <h3>List Of Items</h3>
+    </div>
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">SNo</th>
+          <th scope="col">Title</th>
+          <th scope="col">Description</th>
+          <th scope="col">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm" crossorigin="anonymous"></script>
+  <script>
+    document.getElementById('add').addEventListener('click', add);
+    function add() {
+      const title = document.getElementById('title').value;
+      const desc = document.getElementById('description').value;
+      if (!title || !desc) {
+        alert('Please enter both title and description');
+        return;
+      }
+      let itemJsonArray = JSON.parse(localStorage.getItem('ItemsJson')) || [];
+      itemJsonArray.push([title, desc]);
+      localStorage.setItem('ItemsJson', JSON.stringify(itemJsonArray));
+      document.getElementById('title').value = '';
+      document.getElementById('description').value = '';
+      update();
+    }
+    function update() {
+      let itemJsonArray = JSON.parse(localStorage.getItem('ItemsJson')) || [];
+      const tableBody = document.getElementById('tbody');
+      tableBody.innerHTML = itemJsonArray.map((item, index) => `
+        <tr>
+          <th scope="row">${index + 1}</th>
+          <td>${item[0]}</td>
+          <td>${item[1]}</td>
+          <td><button class="btn btn-danger" onclick="deleted(${index})">Delete</button></td>
+        </tr>
+      `).join('');
+    }
+    function deleted(itemIndex) {
+      let itemJsonArray = JSON.parse(localStorage.getItem('ItemsJson')) || [];
+      itemJsonArray.splice(itemIndex, 1);
+      localStorage.setItem('ItemsJson', JSON.stringify(itemJsonArray));
+      update();
+    }
+    function clearstorage() {
+      if (confirm('Do you really want to delete all items in the list?')) {
+        localStorage.clear();
+        update();
+      }
+    }
+    update();
+  </script>
+</body>
+</html>
